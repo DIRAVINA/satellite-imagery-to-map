@@ -21,7 +21,7 @@ class CustomConv2DTranspose(tf.keras.layers.Conv2DTranspose):
 # Load the model with custom objects
 print("Starting to load model...")
 model = tf.keras.models.load_model(
-    'model/GAN_Sat_image_2_map.h5',
+    'model/GAN_Generator.h5',
     custom_objects={'Conv2DTranspose': CustomConv2DTranspose}
 )
 print("Model loaded successfully!")

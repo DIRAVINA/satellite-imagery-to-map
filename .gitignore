@@ -1,3 +1,6 @@
 venv/
 __pycache__/
 model/
+maps/
+
+.DS_Store
