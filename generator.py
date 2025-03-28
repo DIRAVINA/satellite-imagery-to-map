@@ -18,11 +18,12 @@ class Generator:
         return tf.keras.Sequential([
             Conv2DTranspose(filters, kernel_size=4, strides=2, padding='same', kernel_initializer='he_normal', use_bias=False),
             BatchNormalization(),
+            LeakyReLU(alpha=0.2),
             ReLU()
         ])
 
     def build_generator(self):
-        inputs = Input(shape=(256, 256, 3))
+        inputs = Input(shape=(256, 256, 3), name="InputLayer")
 
         encoder = [self.downscale(f) for f in [64, 128, 256, 512, 512, 512, 512]]
         latent_space = self.downscale(512)
