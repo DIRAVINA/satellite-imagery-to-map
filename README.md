@@ -1,6 +1,3 @@
-Here’s an updated **README file** for your GitHub repository, including **detailed instructions on how to run the code and guidelines for user execution**:
-
----
 
 # Satellite to Map Translation using Pix2Pix GAN
 
