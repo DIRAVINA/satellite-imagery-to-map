@@ -6,9 +6,9 @@ from tensorflow.keras.preprocessing.image import load_img, img_to_array
 
 # Define paths
 VAL_DIR = 'maps/val'
-MODEL_PATH = 'model/GAN_Generator.keras'  
-IMG_HEIGHT, IMG_WIDTH = 256, 256  
-NUM_SAMPLES = 5  
+MODEL_PATH = 'model/GAN_Generator_70.keras'
+IMG_HEIGHT, IMG_WIDTH = 256, 256
+NUM_SAMPLES = 5
 
 def load_val_data(val_dir, img_height, img_width):
     """
@@ -25,8 +25,8 @@ def load_val_data(val_dir, img_height, img_width):
         img = img_to_array(img) / 255.0  # Normalize to [0, 1]
 
         # Split into satellite and map
-        satellite = img[:, :img_width, :]  # Left half
-        map_img = img[:, img_width:, :]   # Right half
+        satellite = img[:, :img_width, :]
+        map_img = img[:, img_width:, :]
 
         satellite_images.append(satellite)
         map_images.append(map_img)
@@ -50,27 +50,30 @@ def show_predictions(generator, satellite_images, map_images, num_samples=5):
         satellite_input = tf.expand_dims(satellite, axis=0)  # Add batch dimension
         predicted = generator.predict(satellite_input, verbose=0)[0]  # Remove batch dimension
 
-        # Clip predicted values to [0, 1] for visualization
-        predicted = np.clip(predicted, 0, 1)
+        # Ensure compatible data type and range for visualization
+        satellite_vis = (satellite * 255).astype(np.uint8)  # Scale to [0, 255] and convert to uint8
+        ground_truth_vis = (ground_truth * 255).astype(np.uint8)
+        predicted_vis = np.clip(predicted, 0, 1)  # Ensure within [0, 1]
+        predicted_vis = (predicted_vis * 255).astype(np.uint8)
 
         # Create a figure with 3 subplots
         plt.figure(figsize=(15, 5))
 
         # Satellite Image
         plt.subplot(1, 3, 1)
-        plt.imshow(satellite)
+        plt.imshow(satellite_vis)
         plt.title("Satellite Image")
         plt.axis('off')
 
         # Ground Truth Map
         plt.subplot(1, 3, 2)
-        plt.imshow(ground_truth)
+        plt.imshow(ground_truth_vis)
         plt.title("Ground Truth Map")
         plt.axis('off')
 
         # Predicted Map
         plt.subplot(1, 3, 3)
-        plt.imshow(predicted)
+        plt.imshow(predicted_vis)
         plt.title("Predicted Map")
         plt.axis('off')
 
