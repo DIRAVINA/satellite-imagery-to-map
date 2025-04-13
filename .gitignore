@@ -7,3 +7,5 @@ maps/
 
 static/input.png
 static/output.png
+
+.env

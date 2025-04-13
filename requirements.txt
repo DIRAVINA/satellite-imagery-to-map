@@ -5,3 +5,4 @@ fastapi==0.115.0
 uvicorn==0.30.6
 python-multipart==0.0.9
 matplotlib==3.10.1
+dotenv==0.21.0
