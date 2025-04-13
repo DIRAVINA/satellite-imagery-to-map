@@ -5,50 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pix2Pix with OSM</title>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <style>
-        #map { height: 600px; width: 100%; }
-        #upload { margin: 20px 0; }
-    </style>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <h1>Pix2Pix with OpenStreetMap</h1>
+    <h1>Satellite to Map Imagery using GAN</h1>
     <div id="map"></div>
-    <div id="upload">
-        <input type="file" id="imageInput" accept="image/*">
-        <button onclick="processImage()">Process Image</button>
+    <div class="button-group">
+        <button onclick="window.location.href='/upload'">Upload Image</button>
+        <button onclick="window.location.href='/fetch'">Fetch Image from Google Maps</button>
     </div>
-    <img id="result" src="" alt="Result" style="max-width: 100%; display: none;">
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <script>
-        // Initialize OSM map
         var map = L.map('map').setView([51.505, -0.09], 13);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         }).addTo(map);
-
-        // Process image with FastAPI backend
-        async function processImage() {
-            const fileInput = document.getElementById('imageInput');
-            const file = fileInput.files[0];
-            if (!file) {
-                alert("Please upload an image!");
-                return;
-            }
-
-            const formData = new FormData();
-            formData.append('file', file);
-
-            const response = await fetch('/process', {
-                method: 'POST',
-                body: formData
-            });
-            const result = await response.json();
-            if (result.image_url) {
-                document.getElementById('result').src = result.image_url;
-                document.getElementById('result').style.display = 'block';
-            }
-        }
     </script>
 </body>
 </html>

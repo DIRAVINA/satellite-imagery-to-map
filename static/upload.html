@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Image</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Upload Image</h1>
+    <div id="map"></div>
+    <div id="upload">
+        <input type="file" id="imageInput" accept="image/*">
+        <button onclick="processImage()">Process Image</button>
+    </div>
+    <div class="image-container">
+        <img id="inputResult" src="" alt="Input Image">
+        <img id="outputResult" src="" alt="Processed Image">
+    </div>
+    <div class="button-group">
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        async function processImage() {
+            const fileInput = document.getElementById('imageInput');
+            const file = fileInput.files[0];
+            if (!file) {
+                alert("Please upload an image!");
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch('/process', {
+                method: 'POST',
+                body: formData
+            });
+            const result = await response.json();
+            if (result.input_image_url && result.output_image_url) {
+                document.getElementById('inputResult').src = result.input_image_url;
+                document.getElementById('outputResult').src = result.output_image_url;
+                document.getElementById('inputResult').style.display = 'block';
+                document.getElementById('outputResult').style.display = 'block';
+            }
+        }
+
+        async function reset() {
+            document.getElementById('inputResult').src = "";
+            document.getElementById('outputResult').src = "";
+            document.getElementById('inputResult').style.display = 'none';
+            document.getElementById('outputResult').style.display = 'none';
+            document.getElementById('imageInput').value = "";
+            await fetch('/reset', { method: 'POST' });
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>

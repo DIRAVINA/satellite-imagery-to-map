@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch Image from Google Maps</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Fetch Image from Google Maps</h1>
+    <div id="map"></div>
+    <div id="location-form">
+        <label for="lat">Latitude:</label>
+        <input type="number" id="lat" step="0.0001" placeholder="Latitude" required><br>
+        <label for="lon">Longitude:</label>
+        <input type="number" id="lon" step="0.0001" placeholder="Longitude" required><br>
+        <label for="radius">Radius (km):</label>
+        <input type="number" id="radius" step="0.1" value="0.5" placeholder="Radius (km)" required><br>
+        <div class="button-group">
+            <button onclick="fetchSatelliteImage()">Fetch Image</button>
+            <button onclick="processSatelliteImage()">Process Image</button>
+        </div>
+    </div>
+    <div class="image-container">
+        <img id="satelliteResult" src="" alt="Satellite Image">
+        <img id="outputResult" src="" alt="Processed Image">
+    </div>
+    <div class="button-group">
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([51.505, -0.09], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        async function fetchSatelliteImage() {
+            const lat = document.getElementById('lat').value;
+            const lon = document.getElementById('lon').value;
+            const radius = document.getElementById('radius').value;
+
+            if (!lat || !lon || !radius) {
+                alert("Please fill all fields!");
+                return;
+            }
+
+            const response = await fetch('/fetch-satellite', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `lat=${lat}&lon=${lon}&radius=${radius}`
+            });
+            const result = await response.json();
+            if (result.satellite_image_url) {
+                document.getElementById('satelliteResult').src = result.satellite_image_url;
+                document.getElementById('satelliteResult').style.display = 'block';
+                document.getElementById('outputResult').src = "";
+                document.getElementById('outputResult').style.display = 'none';
+            }
+        }
+
+        async function processSatelliteImage() {
+            const response = await fetch('/process-satellite', {
+                method: 'POST'
+            });
+            const result = await response.json();
+            if (result.output_image_url) {
+                document.getElementById('outputResult').src = result.output_image_url;
+                document.getElementById('outputResult').style.display = 'block';
+            }
+        }
+
+        async function reset() {
+            document.getElementById('satelliteResult').src = "";
+            document.getElementById('outputResult').src = "";
+            document.getElementById('satelliteResult').style.display = 'none';
+            document.getElementById('outputResult').style.display = 'none';
+            document.getElementById('lat').value = "";
+            document.getElementById('lon').value = "";
+            document.getElementById('radius').value = "0.5";
+            await fetch('/reset', { method: 'POST' });
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
